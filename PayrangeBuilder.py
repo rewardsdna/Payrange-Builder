@@ -62,8 +62,9 @@ def upload_page():
 
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
-        st.header('Uploaded Data')
-        st.write(data)
+        num_records = len(data)
+        st.header('Success!')
+        st.write(num_records)
 
         # Data Visualization Section
         st.header('Data Visualization')
