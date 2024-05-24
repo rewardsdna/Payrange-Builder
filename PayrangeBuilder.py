@@ -35,10 +35,40 @@ def main_page():
         go_to_page('upload')
 
 # Define upload page
+#def upload_page():
+    # File Upload Section
+    # st.header('Upload Data')
+    # uploaded_file = st.file_uploader("Choose a file", type=['csv'])
+
+
+import base64
+
+# Define upload page
 def upload_page():
     # File Upload Section
     st.header('Upload Data')
     uploaded_file = st.file_uploader("Choose a file", type=['csv'])
+
+    # Provide a sample data template for reference
+    sample_data_template = """
+    Column1,Column2,Column3
+    Value1,Value2,Value3
+    Value4,Value5,Value6
+    """
+
+    # Encode the sample data template as bytes
+    sample_data_bytes = sample_data_template.encode('utf-8')
+    # Base64 encode the bytes to create a downloadable link
+    sample_data_b64 = base64.b64encode(sample_data_bytes).decode()
+
+    # Create a downloadable link for the sample data template
+    st.markdown("""
+    If you don't have a file yet, you can download a sample data template from the link below:
+    
+    [Download Sample Data Template](data:application/octet-stream;base64,{})
+    """.format(sample_data_b64), unsafe_allow_html=True)
+
+
 
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
