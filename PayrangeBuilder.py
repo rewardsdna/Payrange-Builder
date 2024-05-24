@@ -65,9 +65,13 @@ def upload_page():
         num_records = len(data)
         st.markdown(f"<h3 style='display: inline; font-size: 18px;'>Success! You have uploaded {num_records} Records</h3>", unsafe_allow_html=True)
 
-# Add a back button
+    # Add navigation buttons
     if st.button("Back"):
-        go_to_page('Page 3')
+        go_to_page('main')
+    if st.button("View Chart"):
+        go_to_page('visualization')
+
+
 
 # Define visualization page
 def visualization_page():
