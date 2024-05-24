@@ -1,96 +1,104 @@
+import streamlit as st
 import pandas as pd
-import numpy_financial as npf
+import altair as alt
 
-# Function to calculate midpoint differential using RATE formula
-def calculate_midpoint_differential(df):
-    max_grade = df['Grade'].max()
-    min_grade = df['Grade'].min()
-    highest_midpoint = df[df['Grade'] == max_grade]['Market Rate'].values[0]
-    lowest_midpoint = df[df['Grade'] == min_grade]['Market Rate'].values[0]
-    nper = max_grade - 1
-    pv = -highest_midpoint
-    fv = lowest_midpoint
-    midpoint_differential = npf.rate(nper, 0, pv, fv, 0)
-    return midpoint_differential
+# Ensure session state is initialized
+def initialize_session_state():
+    if 'page' not in st.session_state:
+        st.session_state.page = 'main'
 
-# Function to interpolate missing grades using the midpoint differential
-def interpolate_missing_grades(df):
-    # Calculate midpoint differential
-    midpoint_differential = calculate_midpoint_differential(df)
+initialize_session_state()
 
-    # Get the range of grades
-    min_grade = df['Grade'].min()
-    max_grade = df['Grade'].max()
+# Define function to navigate to a different page
+def go_to_page(page):
+    st.session_state.page = page
 
-    # Initialize an empty list to store interpolated rows
-    interpolated_rows = []
+# Define main page
+def main_page():
+    # Title of the web app
+    st.title('Pay Range Builder')
 
-    # Iterate over the range of grades to identify and fill missing grades
-    for grade in range(min_grade, max_grade + 1):
-        if grade not in df['Grade'].values:
-            higher_grade = df[df['Grade'] > grade]['Grade'].min()
-            lower_grade = df[df['Grade'] < grade]['Grade'].max()
-            higher_grade_avg = df[df['Grade'] == higher_grade]['Market Rate'].values[0]
-            missing_grade_avg = higher_grade_avg * (1 + midpoint_differential)
-            interpolated_rows.append({'Grade': grade, 'Market Rate': missing_grade_avg})
+    # Description text
+    st.markdown("_Struggling with fair and competitive pay? Our Pay Range Builder tool empowers you to build data-driven pay ranges, ensuring you attract top talent, retain your best, and manage compensation with confidence._")
 
-    # Create a DataFrame from the interpolated rows
-    interpolated_df = pd.DataFrame(interpolated_rows)
+    # Yes/No Question Section
+    st.header("What's your approach?")
+    yes_no = st.radio("I will use", ('Market rates of jobs to create pay ranges', 'Pay data of existing employees to build pay ranges'))
 
-    # Concatenate the original DataFrame and the interpolated DataFrame
-    result_df = pd.concat([df, interpolated_df]).sort_values(by='Grade').reset_index(drop=True)
+    if yes_no == 'Market rates of jobs to create pay ranges':
+        st.success('Good thought! - It is wise to align with the external market!')
+    else:
+        st.warning("That's wise - Internal parity ranks high most often!")
 
-    return result_df
+    # Continue Button
+    if st.button("Let's Continue"):
+        go_to_page('upload')
 
-# Function to calculate trimmed mean
-def calculate_trimmed_mean(group):
-    return group.mean()
+# Define upload page
+def upload_page():
+    # File Upload Section
+    st.header('Upload a CSV file')
+    uploaded_file = st.file_uploader("Choose a file", type=['csv'])
 
-# Test the logic with a sample Excel file
-def process_excel(file_path):
-    df = pd.read_excel(file_path)
+    if uploaded_file is not None:
+        data = pd.read_csv(uploaded_file)
+        st.header('Uploaded Data')
+        st.write(data)
 
-    # Ensure 'Market Rate' is numeric
-    df['Market Rate'] = pd.to_numeric(df['Market Rate'], errors='coerce')
+        # Data Visualization Section
+        st.header('Data Visualization')
 
-    # Calculate trimmed average of Market Rate grouped by Grade
-    trimmed_means = df.groupby('Grade')['Market Rate'].apply(calculate_trimmed_mean).reset_index()
+        if st.checkbox('Show data chart'):
+            # Display column selection widgets
+            x_column = st.selectbox('Select X-axis data', options=data.columns, index=0)  # Default to the first column
+            y_column = st.selectbox('Select Y-axis data', options=data.columns, index=1)  # Default to the second column
 
-    # Interpolate missing grades
-    result_df = interpolate_missing_grades(trimmed_means)
+            # Create Altair Chart object
+            chart = alt.Chart(data[[x_column, y_column]].dropna()).mark_point().encode(
+                x=x_column,
+                y=y_column,
+                tooltip=[x_column, y_column]  # Display selected columns as tooltip
+            ).properties(
+                width=600,
+                height=400
+            )
 
-    # Define multipliers for each grade
-    multipliers = [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]  # Example multipliers for each grade
+            # Plot Altair chart
+            st.altair_chart(chart, use_container_width=True)
 
-    # Modify range minimum and range maximum for each grade using the specified multiplier
-    result_df['Range Minimum'] = result_df.apply(lambda row: row['Market Rate'] * (1 - multipliers[int(row['Grade']) - 1]), axis=1)
-    result_df['Range Maximum'] = result_df.apply(lambda row: row['Market Rate'] * (1 + multipliers[int(row['Grade']) - 1]), axis=1)
+    # Add a back button
+    if st.button("Back"):
+        go_to_page('main')
 
-    # Calculate range spread
-    result_df['Range Spread'] = (result_df['Range Maximum'] / result_df['Range Minimum']) - 1
+# Define settings page
+def settings_page():
+    st.header('Settings')
+    st.write("This is the settings page.")
 
-    # Calculate MPD (Midpoint Differential) and add 'Mid Pnt Diff' column
-    result_df['MPD'] = result_df['Market Rate'].shift(1) / result_df['Market Rate'] - 1
-    result_df['Mid Pnt Diff'] = result_df['MPD'].apply(lambda x: '-' if pd.isna(x) else f'{x:.1%}')
+    if st.button("Back"):
+        go_to_page('main')
 
-    # Drop the 'MPD' column
-    result_df.drop(columns=['MPD'], inplace=True)
+# Define Page 3
+def page_3():
+    st.header('Page 3')
+    st.write("This is Page 3.")
 
-    # Rename columns
-    result_df.rename(columns={'Market Rate': 'Range Mid', 'Range Minimum': 'Range Min', 'Range Maximum': 'Range Max'}, inplace=True)
+    if st.button("Back"):
+        go_to_page('upload')
 
-    # Reorder columns
-    result_df = result_df[['Grade', 'Range Min', 'Range Mid', 'Range Max', 'Mid Pnt Diff', 'Range Spread']]
-
-    # Format the market rate, range minimum, and range maximum with comma as thousand separators
-    result_df['Range Mid'] = result_df['Range Mid'].apply(lambda x: '{:,.0f}'.format(x))
-    result_df['Range Min'] = result_df['Range Min'].apply(lambda x: '{:,.0f}'.format(x))
-    result_df['Range Max'] = result_df['Range Max'].apply(lambda x: '{:,.0f}'.format(x))
-    result_df['Range Spread'] = (result_df['Range Spread'] * 100).round(1).astype(str) + '%'
-
-    return result_df
-
-# Example usage (replace 'your_file.xlsx' with your actual file path)
-file_path = 'Data.xlsx'
-result_df = process_excel(file_path)
-print(result_df)
+# Page routing
+def run_app():
+    if 'page' not in st.session_state:
+        st.session_state.page = 'main'
+    if st.session_state.page == 'main':
+        main_page()
+    elif st.session_state.page == 'upload':
+        upload_page()
+    elif st.session_state.page == 'settings':
+        settings_page()
+    elif st.session_state.page == 'page_3':
+        page_3()
+ 
+# Run the app
+if __name__ == "__main__":
+    run_app()
