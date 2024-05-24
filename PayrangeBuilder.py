@@ -93,7 +93,7 @@ def visualization_page():
     if st.button("Back"):
         go_to_page('main')
 
-# Define visualization page
+# Define settings page
     def visualization():
         st.header('Settings')
         st.write("This is the settings page.")
