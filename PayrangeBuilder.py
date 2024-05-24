@@ -84,9 +84,8 @@ chart = alt.Chart(data).mark_point().encode(
 # Plot Altair chart
 st.altair_chart(chart, use_container_width=True)
 
-
-    # Add a back button
-    if st.button("Back"):
+# Add a back button
+if st.button("Back"):
         go_to_page('main')
 
 # Define settings page
