@@ -1,0 +1,96 @@
+import pandas as pd
+import numpy_financial as npf
+
+# Function to calculate midpoint differential using RATE formula
+def calculate_midpoint_differential(df):
+    max_grade = df['Grade'].max()
+    min_grade = df['Grade'].min()
+    highest_midpoint = df[df['Grade'] == max_grade]['Market Rate'].values[0]
+    lowest_midpoint = df[df['Grade'] == min_grade]['Market Rate'].values[0]
+    nper = max_grade - 1
+    pv = -highest_midpoint
+    fv = lowest_midpoint
+    midpoint_differential = npf.rate(nper, 0, pv, fv, 0)
+    return midpoint_differential
+
+# Function to interpolate missing grades using the midpoint differential
+def interpolate_missing_grades(df):
+    # Calculate midpoint differential
+    midpoint_differential = calculate_midpoint_differential(df)
+
+    # Get the range of grades
+    min_grade = df['Grade'].min()
+    max_grade = df['Grade'].max()
+
+    # Initialize an empty list to store interpolated rows
+    interpolated_rows = []
+
+    # Iterate over the range of grades to identify and fill missing grades
+    for grade in range(min_grade, max_grade + 1):
+        if grade not in df['Grade'].values:
+            higher_grade = df[df['Grade'] > grade]['Grade'].min()
+            lower_grade = df[df['Grade'] < grade]['Grade'].max()
+            higher_grade_avg = df[df['Grade'] == higher_grade]['Market Rate'].values[0]
+            missing_grade_avg = higher_grade_avg * (1 + midpoint_differential)
+            interpolated_rows.append({'Grade': grade, 'Market Rate': missing_grade_avg})
+
+    # Create a DataFrame from the interpolated rows
+    interpolated_df = pd.DataFrame(interpolated_rows)
+
+    # Concatenate the original DataFrame and the interpolated DataFrame
+    result_df = pd.concat([df, interpolated_df]).sort_values(by='Grade').reset_index(drop=True)
+
+    return result_df
+
+# Function to calculate trimmed mean
+def calculate_trimmed_mean(group):
+    return group.mean()
+
+# Test the logic with a sample Excel file
+def process_excel(file_path):
+    df = pd.read_excel(file_path)
+
+    # Ensure 'Market Rate' is numeric
+    df['Market Rate'] = pd.to_numeric(df['Market Rate'], errors='coerce')
+
+    # Calculate trimmed average of Market Rate grouped by Grade
+    trimmed_means = df.groupby('Grade')['Market Rate'].apply(calculate_trimmed_mean).reset_index()
+
+    # Interpolate missing grades
+    result_df = interpolate_missing_grades(trimmed_means)
+
+    # Define multipliers for each grade
+    multipliers = [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]  # Example multipliers for each grade
+
+    # Modify range minimum and range maximum for each grade using the specified multiplier
+    result_df['Range Minimum'] = result_df.apply(lambda row: row['Market Rate'] * (1 - multipliers[int(row['Grade']) - 1]), axis=1)
+    result_df['Range Maximum'] = result_df.apply(lambda row: row['Market Rate'] * (1 + multipliers[int(row['Grade']) - 1]), axis=1)
+
+    # Calculate range spread
+    result_df['Range Spread'] = (result_df['Range Maximum'] / result_df['Range Minimum']) - 1
+
+    # Calculate MPD (Midpoint Differential) and add 'Mid Pnt Diff' column
+    result_df['MPD'] = result_df['Market Rate'].shift(1) / result_df['Market Rate'] - 1
+    result_df['Mid Pnt Diff'] = result_df['MPD'].apply(lambda x: '-' if pd.isna(x) else f'{x:.1%}')
+
+    # Drop the 'MPD' column
+    result_df.drop(columns=['MPD'], inplace=True)
+
+    # Rename columns
+    result_df.rename(columns={'Market Rate': 'Range Mid', 'Range Minimum': 'Range Min', 'Range Maximum': 'Range Max'}, inplace=True)
+
+    # Reorder columns
+    result_df = result_df[['Grade', 'Range Min', 'Range Mid', 'Range Max', 'Mid Pnt Diff', 'Range Spread']]
+
+    # Format the market rate, range minimum, and range maximum with comma as thousand separators
+    result_df['Range Mid'] = result_df['Range Mid'].apply(lambda x: '{:,.0f}'.format(x))
+    result_df['Range Min'] = result_df['Range Min'].apply(lambda x: '{:,.0f}'.format(x))
+    result_df['Range Max'] = result_df['Range Max'].apply(lambda x: '{:,.0f}'.format(x))
+    result_df['Range Spread'] = (result_df['Range Spread'] * 100).round(1).astype(str) + '%'
+
+    return result_df
+
+# Example usage (replace 'your_file.xlsx' with your actual file path)
+file_path = 'Data.xlsx'
+result_df = process_excel(file_path)
+print(result_df)
