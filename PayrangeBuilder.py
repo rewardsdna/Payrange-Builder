@@ -65,11 +65,14 @@ def upload_page():
         num_records = len(data)
         st.markdown(f"<h3 style='display: inline; font-size: 18px;'>Success! You have uploaded {num_records} Records</h3>", unsafe_allow_html=True)
 
-    # Add navigation buttons
-    if st.button("Back"):
-        go_to_page('main')
-    if st.button("View Chart"):
-        go_to_page('visualization')
+# Add navigation buttons
+if st.button("Back"):
+    go_to_page('main')
+if st.button("View Chart"):
+    go_to_page('visualization')
+if st.button("Visualization 2"):  # Add this button
+    go_to_page('visualization2')  # Navigate to visualization 2 page
+
 
 
 # Define visualization page
@@ -101,13 +104,15 @@ def visualization_page():
     if st.button("Back"):
         go_to_page('main')
 
-# Define Page 3
-def visualization2():
-    st.header('visualization')
-    st.write("This is how your data looks!")
+# Define visualization 2 page
+def visualization2_page():
+    st.header('Visualization 2')
+    st.write("This is Visualization 2.")
 
+    # Add navigation buttons
     if st.button("Back"):
         go_to_page('upload')
+
 
 # Page routing
 def run_app():
@@ -118,9 +123,10 @@ def run_app():
     elif st.session_state.page == 'upload':
         upload_page()
     elif st.session_state.page == 'visualization':
-        visualization()
-    elif st.session_state.page == 'visualization2':
-        visualization2()
+        visualization_page()
+    elif st.session_state.page == 'visualization2':  # Add this condition
+        visualization2_page()  # Add this function call
+
  
 # Run the app
 if __name__ == "__main__":
