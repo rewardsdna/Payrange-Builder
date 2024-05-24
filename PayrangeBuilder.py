@@ -81,8 +81,8 @@ def visualization_page():
         height=400
     )
 
-            # Plot Altair chart
-            st.altair_chart(chart, use_container_width=True)
+    # Plot Altair chart
+   st.altair_chart(chart, use_container_width=True)
 
     # Add a back button
     if st.button("Back"):
