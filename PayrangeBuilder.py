@@ -51,8 +51,8 @@ def upload_page():
 
     # Provide a sample data template for reference
     sample_data_template = """
-    Column1,Column2,Column3
-    Value1,Value2,Value3
+    Job,Grade,Market Rate
+    Accountant,12,43000
     Value4,Value5,Value6
     """
 
@@ -63,12 +63,10 @@ def upload_page():
 
     # Create a downloadable link for the sample data template
     st.markdown("""
-    If you don't have a file yet, you can download a sample data template from the link below:
+    You can download the data template from the link below:
     
-    [Download Sample Data Template](data:application/octet-stream;base64,{})
+    [Download Data Template (CSV)](data:text/csv;base64,{})
     """.format(sample_data_b64), unsafe_allow_html=True)
-
-
 
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
