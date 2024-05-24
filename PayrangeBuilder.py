@@ -53,7 +53,7 @@ def upload_page():
     sample_data_template = """
     Job,Grade,Market Rate
     Accountant,12,43000
-    Value4,Value5,Value6
+    Payroll Assistant,11,38500
     """
 
     # Encode the sample data template as bytes
@@ -63,7 +63,7 @@ def upload_page():
 
     # Create a downloadable link for the sample data template
     st.markdown("""
-    You can download the data template here: [Data Template](data:text/csv;base64,{})
+    Here is the [Data Template](data:text/csv;base64,{})
     """.format(sample_data_b64), unsafe_allow_html=True)
 
     if uploaded_file is not None:
