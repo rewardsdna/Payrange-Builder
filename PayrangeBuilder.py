@@ -39,6 +39,10 @@ import base64
 
 # Define upload page
 def upload_page():
+    # File Upload Section
+    st.header('Upload Data')
+    uploaded_file = st.file_uploader("Choose a file", type=['csv'])
+
     # Provide a sample data template for reference
     sample_data_template = """
     Job,Grade,Market Rate
@@ -53,9 +57,8 @@ def upload_page():
 
     # Create a downloadable link for the sample data template
     st.markdown("""
-    ### [Download Template](data:text/csv;base64,{})
+    Here is the [Data Template](data:text/csv;base64,{})
     """.format(sample_data_b64), unsafe_allow_html=True)
-
 
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
