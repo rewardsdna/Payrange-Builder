@@ -34,12 +34,6 @@ def main_page():
     if st.button("Let's Continue"):
         go_to_page('upload')
 
-# Define upload page
-#def upload_page():
-    # File Upload Section
-    # st.header('Upload Data')
-    # uploaded_file = st.file_uploader("Choose a file", type=['csv'])
-
 
 import base64
 
