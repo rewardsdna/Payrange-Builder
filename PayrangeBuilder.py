@@ -67,23 +67,19 @@ def upload_page():
 
 
 
-        # Data Visualization Section
-        st.header('Data Visualization')
+# Define visualization page
+def visualization_page():
+    st.header('Data Visualization')
 
-        if st.checkbox('Show data chart'):
-            # Display column selection widgets
-            x_column = st.selectbox('Select X-axis data', options=data.columns, index=0)  # Default to the first column
-            y_column = st.selectbox('Select Y-axis data', options=data.columns, index=1)  # Default to the second column
-
-            # Create Altair Chart object
-            chart = alt.Chart(data[[x_column, y_column]].dropna()).mark_point().encode(
-                x=x_column,
-                y=y_column,
-                tooltip=[x_column, y_column]  # Display selected columns as tooltip
-            ).properties(
-                width=600,
-                height=400
-            )
+    # Create Altair Chart object
+    chart = alt.Chart(data).mark_point().encode(
+        x='Column 2',
+        y='Column 3',
+        tooltip=['Column 2', 'Column 3']  # Display selected columns as tooltip
+    ).properties(
+        width=600,
+        height=400
+    )
 
             # Plot Altair chart
             st.altair_chart(chart, use_container_width=True)
