@@ -72,7 +72,6 @@ def upload_page():
         go_to_page('visualization')
 
 
-
 # Define visualization page
 def visualization_page():
     st.header('Data Visualization')
@@ -104,8 +103,8 @@ def visualization_page():
 
 # Define Page 3
 def page_3():
-    st.header('Page 3')
-    st.write("This is Page 3.")
+    st.header('visualization')
+    st.write("This is how your data looks!")
 
     if st.button("Back"):
         go_to_page('upload')
@@ -118,9 +117,9 @@ def run_app():
         main_page()
     elif st.session_state.page == 'upload':
         upload_page()
-    elif st.session_state.page == 'settings':
+    elif st.session_state.page == 'visualization':
         settings_page()
-    elif st.session_state.page == 'page_3':
+    elif st.session_state.page == 'visualization2':
         page_3()
  
 # Run the app
