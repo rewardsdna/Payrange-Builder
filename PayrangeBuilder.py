@@ -94,7 +94,7 @@ def visualization_page():
         go_to_page('main')
 
 # Define settings page
-    def visualization():
+    def settings_page():
         st.header('Settings')
         st.write("This is the settings page.")
 
@@ -102,7 +102,7 @@ def visualization_page():
         go_to_page('main')
 
 # Define Page 3
-def visualization2():
+def page_3():
     st.header('visualization')
     st.write("This is how your data looks!")
 
@@ -118,9 +118,9 @@ def run_app():
     elif st.session_state.page == 'upload':
         upload_page()
     elif st.session_state.page == 'visualization':
-        visualization()
+        settings_page()
     elif st.session_state.page == 'visualization2':
-        visualization2()
+        page_3()
  
 # Run the app
 if __name__ == "__main__":
