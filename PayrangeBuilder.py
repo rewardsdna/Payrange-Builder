@@ -71,18 +71,19 @@ def upload_page():
 def visualization_page():
     st.header('Data Visualization')
 
-    # Create Altair Chart object
-    chart = alt.Chart(data).mark_point().encode(
-        x='Column 2',
-        y='Column 3',
-        tooltip=['Column 2', 'Column 3']  # Display selected columns as tooltip
-    ).properties(
-        width=600,
-        height=400
-    )
 
-    # Plot Altair chart
-   st.altair_chart(chart, use_container_width=True)
+# Create Altair Chart object
+chart = alt.Chart(data).mark_point().encode(
+    x='Column 2',
+    y='Column 3',
+    tooltip=['Column 2', 'Column 3']  # Display selected columns as tooltip
+).properties(
+    width=600,
+    height=400
+)
+# Plot Altair chart
+st.altair_chart(chart, use_container_width=True)
+
 
     # Add a back button
     if st.button("Back"):
