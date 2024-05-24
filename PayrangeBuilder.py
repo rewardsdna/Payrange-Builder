@@ -67,6 +67,19 @@ def upload_page():
 
 
 
+        # Add navigation buttons
+        if st.button("Back"):
+            go_to_page('main')
+        if st.button("View Chart"):
+            go_to_page('visualization')
+
+# Define visualization page
+def visualization_page():
+    st.header('Data Visualization')
+
+    
+
+
         # Data Visualization Section
         st.header('Data Visualization')
 
