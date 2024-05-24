@@ -37,7 +37,7 @@ def main_page():
 # Define upload page
 def upload_page():
     # File Upload Section
-    st.header('Upload a CSV file')
+    st.header('Upload Data')
     uploaded_file = st.file_uploader("Choose a file", type=['csv'])
 
     if uploaded_file is not None:
