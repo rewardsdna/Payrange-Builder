@@ -63,9 +63,7 @@ def upload_page():
 
     # Create a downloadable link for the sample data template
     st.markdown("""
-    You can download the data template from the link below:
-    
-    [Download Data Template (CSV)](data:text/csv;base64,{})
+    You can download the data template here: [Data Template](data:text/csv;base64,{})
     """.format(sample_data_b64), unsafe_allow_html=True)
 
     if uploaded_file is not None:
