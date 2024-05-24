@@ -63,8 +63,8 @@ def upload_page():
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
         num_records = len(data)
-        st.header('Success!')
-        st.write(num_records)
+        st.markdown(f"<h3 style='display: inline; font-size: 18px;'>Success! You have uploaded</h3><h3 style='display: inline; font-size: 18px;'>{num_records}</h3>", unsafe_allow_html=True)
+
 
         # Data Visualization Section
         st.header('Data Visualization')
