@@ -73,25 +73,25 @@ def visualization_page():
 
 
 # Create Altair Chart object
-chart = alt.Chart(data).mark_point().encode(
-    x='Column 2',
-    y='Column 3',
-    tooltip=['Column 2', 'Column 3']  # Display selected columns as tooltip
-).properties(
-    width=600,
-    height=400
-)
+    chart = alt.Chart(data).mark_point().encode(
+        x='Column 2',
+        y='Column 3',
+        tooltip=['Column 2', 'Column 3']  # Display selected columns as tooltip
+    ).properties(
+        width=600,
+        height=400
+    )
 # Plot Altair chart
-st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
 
 # Add a back button
-if st.button("Back"):
+    if st.button("Back"):
         go_to_page('main')
 
 # Define settings page
-def settings_page():
-    st.header('Settings')
-    st.write("This is the settings page.")
+    def settings_page():
+        st.header('Settings')
+        st.write("This is the settings page.")
 
     if st.button("Back"):
         go_to_page('main')
